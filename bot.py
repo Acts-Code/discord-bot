@@ -40,7 +40,7 @@ async def check_inactive():
         now = asyncio.get_event_loop().time()
         
         if now - last_message_time > 1800:  # 30 mins inactive
-            channel = discord.utils.get(bot.get_all_channels(), name="general")
+            channel = bot.get_channel(1481723127703797793)
             
             if channel:
                 messages = [
