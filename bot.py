@@ -9,17 +9,8 @@ from discord import app_commands
 from ai import ask_ai
 from urllib.parse import quote_plus
 #============FIREBASE====================#
-import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase import db
 
-import json
-
-firebase_json = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
-
-cred = credentials.Certificate(firebase_json)
-firebase_admin.initialize_app(cred)
-
-db = firestore.client()
 def add_rep(user_id, amount):
 
     ref = db.collection("reputation").document(str(user_id))
@@ -34,6 +25,7 @@ def add_rep(user_id, amount):
     ref.set({
         "rep": current + amount
     })
+
 print("Firebase connected!")
 # ================= TOKENS ================= #
 TOKEN = os.getenv("TOKEN")
