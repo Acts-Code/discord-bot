@@ -417,7 +417,41 @@ async def ball(interaction: discord.Interaction, question: str):
     await interaction.response.send_message(
         random.choice(answers)
     )
+@bot.tree.command(
+    name="embed",
+    description="Send a custom embed message."
+)
+async def embed(
+    interaction: discord.Interaction,
+    title: str,
+    message: str,
+    color: str = "blue"
+):
 
+    colors = {
+        "red": discord.Color.red(),
+        "blue": discord.Color.blue(),
+        "green": discord.Color.green(),
+        "gold": discord.Color.gold(),
+        "purple": discord.Color.purple(),
+        "pink": discord.Color.magenta(),
+        "black": discord.Color.dark_theme()
+    }
+
+    embed = discord.Embed(
+        title=title,
+        description=message,
+        color=colors.get(color.lower(), discord.Color.blue())
+    )
+
+    embed.set_footer(
+        text=f"Sent by {interaction.user}",
+        icon_url=interaction.user.display_avatar.url
+    )
+
+    embed.timestamp = datetime.datetime.utcnow()
+
+    await interaction.response.send_message(embed=embed)
 @bot.tree.command(
     name="random",
     description="Randomly pick something from a list.(Separate iteams using comma)"
