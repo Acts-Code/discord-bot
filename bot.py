@@ -44,51 +44,6 @@ ADMIN_ROLE_IDS = [
     1484279764922667008,
     1492620579713323070
 ]
-# ================= TRACK SYSTEM ================= #
-
-def keep_track():
-
-    async def predicate(interaction: discord.Interaction):
-
-        try:
-
-            user_id = str(interaction.user.id)
-            command_name = interaction.command.name
-
-            ref = db.collection("command_logs").document(user_id)
-
-            doc = ref.get()
-
-            if doc.exists:
-                data = doc.to_dict()
-            else:
-                data = {
-                    "total_commands": 0,
-                    "commands": {}
-                }
-
-            commands = data.get("commands", {})
-
-            # increase command count
-            commands[command_name] = commands.get(command_name, 0) + 1
-
-            # update total
-            total = data.get("total_commands", 0) + 1
-
-            ref.set({
-                "username": str(interaction.user),
-                "total_commands": total,
-                "commands": commands,
-                "last_command": command_name,
-                "last_used": datetime.datetime.utcnow().isoformat()
-            })
-
-        except Exception as e:
-            print("TRACK ERROR:", e)
-
-        return True
-
-    return app_commands.check(predicate)
 
 #=============OWNERONLY HELPER============#
 def is_owner(interaction: discord.Interaction):
@@ -385,7 +340,7 @@ async def check_inactive():
     description="Shows the bot latency."
 )
 @not_blocked()
-@keep_track()
+  
 async def ping(interaction: discord.Interaction):
 
     await interaction.response.send_message(
@@ -396,7 +351,7 @@ async def ping(interaction: discord.Interaction):
     description="Ask Actor anything"
 )
 @not_blocked()
-@keep_track()
+  
 async def ai(interaction: discord.Interaction, question: str):
 
     await interaction.response.defer()
@@ -409,7 +364,7 @@ async def ai(interaction: discord.Interaction, question: str):
     description="Flip a coin."
 )
 @not_blocked()
-@keep_track()
+  
 async def coin(interaction: discord.Interaction):
 
     await interaction.response.send_message(
@@ -421,7 +376,7 @@ async def coin(interaction: discord.Interaction):
     description="Roll a dice from 1 to 6."
 )
 @not_blocked()
-@keep_track()
+  
 async def dice(interaction: discord.Interaction):
 
     await interaction.response.send_message(
@@ -433,7 +388,7 @@ async def dice(interaction: discord.Interaction):
     description="Ask the magic 8ball a question."
 )
 @not_blocked()
-@keep_track()
+  
 async def ball(interaction: discord.Interaction, question: str):
 
     answers = [
@@ -464,7 +419,7 @@ async def embed(
         "gold": discord.Color.gold(),
         "purple": discord.Color.purple(),
         "pink": discord.Color.magenta(),
-        "black": discord.Color.dark_theme()
+        "black": discord.Color.default()
     }
 
     embed = discord.Embed(
@@ -486,7 +441,7 @@ async def embed(
     description="Randomly pick something from a list.(Separate iteams using comma)"
 )
 @not_blocked()
-@keep_track()
+  
 async def random_pick(interaction: discord.Interaction, items: str):
 
     choices = [
@@ -507,7 +462,7 @@ async def random_pick(interaction: discord.Interaction, items: str):
     name="say",
     description="Make the bot say something."
 )
-@keep_track()
+  
 @not_blocked()
 async def say(interaction: discord.Interaction, message: str):
 
@@ -572,7 +527,7 @@ async def reputation(
     description="Send an announcement to the server."
 )
 @not_blocked()
-@keep_track()
+  
 async def announcement(
     interaction: discord.Interaction,
     title: str,
@@ -608,7 +563,7 @@ async def announcement(
     description="Show a user's avatar."
 )
 @not_blocked()
-@keep_track()
+  
 async def avatar(
     interaction: discord.Interaction,
     member: discord.Member = None
@@ -635,7 +590,7 @@ async def avatar(
     description="Get a random fact."
 )
 @not_blocked()
-@keep_track()
+  
 async def fact(interaction: discord.Interaction):
 
     await interaction.response.send_message(
@@ -647,7 +602,7 @@ async def fact(interaction: discord.Interaction):
     description="Get a random joke."
 )
 @not_blocked()
-@keep_track()
+  
 async def joke(interaction: discord.Interaction):
 
     await interaction.response.send_message(
@@ -659,7 +614,7 @@ async def joke(interaction: discord.Interaction):
     description="Shows the current server time."
 )
 @not_blocked()
-@keep_track()
+  
 async def time_cmd(interaction: discord.Interaction):
 
     current = datetime.datetime.now().strftime("%H:%M:%S")
@@ -680,6 +635,9 @@ async def fhaa(interaction: discord.Interaction):
         )
 
     channel = interaction.user.voice.channel
+    voice = interaction.guild.voice_client
+
+if not voice:
     voice = await channel.connect()
 
     await interaction.response.send_message("fahh🔥 (playing in VC)")
@@ -697,7 +655,7 @@ async def fhaa(interaction: discord.Interaction):
     description="Ban a member from the server."
 )
 @not_blocked()
-@keep_track()
+  
 async def ban(
     interaction: discord.Interaction,
     member: discord.Member,
@@ -728,7 +686,7 @@ async def ban(
     description="Lock the current channel."
 )
 @not_blocked()
-@keep_track()
+  
 async def lock(interaction: discord.Interaction):
 
     if not is_admin(interaction):
@@ -757,7 +715,7 @@ async def lock(interaction: discord.Interaction):
     description="Unlock the current channel."
 )
 @not_blocked()
-@keep_track()
+  
 async def unlock(interaction: discord.Interaction):
 
     if not is_admin(interaction):
@@ -787,7 +745,7 @@ async def unlock(interaction: discord.Interaction):
     description="Warn a member."
 )
 @not_blocked()
-@keep_track()
+  
 async def warn(interaction: discord.Interaction, member: discord.Member, reason: str):
 
     if not is_admin(interaction):
@@ -811,7 +769,7 @@ async def warn(interaction: discord.Interaction, member: discord.Member, reason:
     description="Delete a number of messages."
 )
 @not_blocked()
-@keep_track()
+  
 async def clear(
     interaction: discord.Interaction,
     amount: int
@@ -852,7 +810,7 @@ async def clear(
     description="Unban a user using their ID."
 )
 @not_blocked()
-@keep_track()
+  
 async def unban(
     interaction: discord.Interaction,
     user_id: str
@@ -887,7 +845,7 @@ async def unban(
     description="Timeout a member for a specific amount of time."
 )
 @not_blocked()
-@keep_track()
+  
 async def mute(
     interaction: discord.Interaction,
     member: discord.Member,
@@ -923,7 +881,7 @@ async def mute(
     description="Report a user to the staff team."
 )
 @not_blocked()
-@keep_track()
+  
 async def report(
     interaction: discord.Interaction,
     member: discord.Member,
@@ -1041,7 +999,7 @@ async def report(
     description="Remove timeout from a member."
 )
 @not_blocked()
-@keep_track()
+  
 async def unmute(
     interaction: discord.Interaction,
     member: discord.Member
@@ -1076,7 +1034,7 @@ async def unmute(
     description="Shows information about the server."
 )
 @not_blocked()
-@keep_track()
+  
 async def serverinfo(interaction: discord.Interaction):
 
     guild = interaction.guild
@@ -1105,7 +1063,7 @@ async def serverinfo(interaction: discord.Interaction):
     description="Shows all Actor commands."
 )
 @not_blocked()
-@keep_track()
+  
 async def help_act(interaction: discord.Interaction):
 
     embed = discord.Embed(
@@ -1203,7 +1161,7 @@ async def help_act(interaction: discord.Interaction):
     description="Shows information about a user."
 )
 @not_blocked()
-@keep_track()
+  
 async def userinfo(
     interaction: discord.Interaction,
     member: discord.Member = None
@@ -1237,7 +1195,7 @@ async def userinfo(
     description="Shows a user's profile picture."
 )
 @not_blocked()
-@keep_track()
+  
 async def profile(
     interaction: discord.Interaction,
     member: discord.Member = None
@@ -1261,7 +1219,7 @@ async def profile(
     description="Start a countdown timer."
 )
 @not_blocked()
-@keep_track()
+  
 async def timer(
     interaction: discord.Interaction,
     seconds: int
@@ -1287,7 +1245,7 @@ async def timer(
     description="Set a reminder."
 )
 @not_blocked()
-@keep_track()
+  
 async def remind(
     interaction: discord.Interaction,
     seconds: int,
