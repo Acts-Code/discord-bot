@@ -6,7 +6,7 @@ import aiohttp
 import os
 from discord.ext import commands
 from discord import app_commands
-from openai import OpenAI
+from ai import ask_ai
 from urllib.parse import quote_plus
 #============FIREBASE====================#
 import firebase_admin
@@ -64,14 +64,6 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 last_message_time = None
-
-# ================= OPENROUTER ================= #
-OPENROUTER_API = os.getenv("AI_API_KEY")
-
-client = OpenAI(
-    api_key=OPENROUTER_API,
-    base_url="https://openrouter.ai/api/v1"
-)
 #===============ADMIN CHECK===================#
 def is_admin(interaction: discord.Interaction):
     if not interaction.guild:
@@ -140,48 +132,6 @@ async def unblock(
     await interaction.response.send_message(
         f"✅ {member.mention} has been unblocked."
     )
-# ================= AI =================#
-#=================HELPERS==============#
-def get_memory(user_id):
-    ref = db.collection("memory").document(str(user_id))
-    doc = ref.get()
-
-    if doc.exists:
-        return doc.to_dict().get("messages", [])
-    return []
-def save_memory(user_id, messages):
-    db.collection("memory").document(str(user_id)).set({
-        "messages": messages[-15:]  # keep last 15 messages
-    })
-#========REAL AI THING=====================#
-MODEL = "meta-llama/llama-3.1-8b-instruct"
-async def ask_ai(user_id, prompt):
-
-    history = get_memory(user_id)
-
-    history.append({"role": "user", "content": prompt})
-
-    try:
-        response = client.chat.completions.create(
-            model=MODEL,
-            max_tokens=300,
-            messages=[
-                {"role": "system", "content": "You are Actor, a helpful Discord bot AI."},
-                *history
-            ]
-        )
-
-        reply = response.choices[0].message.content
-
-        history.append({"role": "assistant", "content": reply})
-
-        save_memory(user_id, history)
-
-        return reply
-
-    except Exception as e:
-        print("AI error:", e)
-        return "⚠️ AI error."
 # ================= FACT ================= #
 async def get_fact():
     try:
