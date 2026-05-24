@@ -89,6 +89,7 @@ def keep_track():
         return True
 
     return app_commands.check(predicate)
+
 #=============OWNERONLY HELPER============#
 def is_owner(interaction: discord.Interaction):
     return interaction.user.id == OWNER_ID
@@ -101,6 +102,34 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 last_message_time = None
+#=============HEROS===================#
+@bot.event
+async def on_app_command_completion(interaction: discord.Interaction, command):
+    try:
+        user_id = str(interaction.user.id)
+        command_name = command.name
+
+        ref = db.collection("command_logs").document(user_id)
+
+        doc = ref.get()
+        data = doc.to_dict() if doc.exists else {
+            "total_commands": 0,
+            "commands": {}
+        }
+
+        commands = data.get("commands", {})
+        commands[command_name] = commands.get(command_name, 0) + 1
+
+        ref.set({
+            "username": str(interaction.user),
+            "total_commands": data.get("total_commands", 0) + 1,
+            "commands": commands,
+            "last_command": command_name,
+            "last_used": datetime.datetime.utcnow().isoformat()
+        })
+
+    except Exception as e:
+        print("TRACK ERROR:", e)
 #===============ADMIN CHECK===================#
 def is_admin(interaction: discord.Interaction):
     if not interaction.guild:
