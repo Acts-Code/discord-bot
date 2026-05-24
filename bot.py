@@ -1300,6 +1300,6 @@ async def on_member_join(member):
 
     except Exception as e:
         print("Welcome error:", e)
-
+print("yah running")
 # ================= RUN ================= #
 bot.run(TOKEN)
