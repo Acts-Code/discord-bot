@@ -66,7 +66,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 last_message_time = None
 
 # ================= OPENROUTER ================= #
-OPENROUTER_API = os.getenv("API_KEY_AI")
+OPENROUTER_API = os.getenv("AI_API_KEY")
 
 client = OpenAI(
     api_key=OPENROUTER_API,
