@@ -1077,7 +1077,6 @@ async def serverinfo(interaction: discord.Interaction):
     description="Shows all Actor commands."
 )
 @not_blocked()
-@keep_track()
 async def help_act(interaction: discord.Interaction, command: str = None):
 
     embed = discord.Embed(
