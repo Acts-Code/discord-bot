@@ -1,13 +1,23 @@
 import discord
+print("discord is good")
 import random
+print("random good")
 import asyncio
+print("asyncio good")
 import datetime
+print("datetime good")
 import aiohttp
+print("aiohttp good")
 import os
+print("os good")
 from discord.ext import commands
+print("discord.ext- commands good")
 from discord import app_commands
+print("discord- app_commands good")
 from ai import ask_ai
+print("ai-ask ai good")
 from urllib.parse import quote_plus
+print("urllib.parse-quote_plus")
 #============FIREBASE====================#
 from firebase import db
 
