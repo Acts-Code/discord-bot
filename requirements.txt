@@ -1,1 +1,5 @@
 discord.py
+firebase-admin
+openai
+PyNaCl
+aiohttp
