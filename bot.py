@@ -655,7 +655,7 @@ async def fhaa(interaction: discord.Interaction):
 
     await interaction.response.send_message("fahh🔥 (playing in VC)")
 
-    audio_file = discord.FFmpegPCMAudio("fahh.mp3")  # put your file here
+    audio_file = discord.FFmpegPCMAudio("Fahhh - QuickSounds.com.mp3")  # put your file here
     voice.play(audio_file)
 
     while voice.is_playing():
