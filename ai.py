@@ -1,20 +1,9 @@
 import os
 import json
 from openai import OpenAI
-import firebase_admin
-from firebase_admin import credentials
 
 # ================= FIREBASE =================
-firebase_json = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
-
-cred = credentials.Certificate(firebase_json)
-
-# prevent double initialization crash on Railway
-if not firebase_admin._apps:
-    firebase_admin.initialize_app(cred)
-
-from firebase_admin import firestore
-db = firestore.client()
+from firebase import db
 
 # ================= OPENROUTER =================
 client = OpenAI(
