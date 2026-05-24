@@ -1072,98 +1072,97 @@ async def serverinfo(interaction: discord.Interaction):
 )
 @not_blocked()
   
-async def help_act(interaction: discord.Interaction):
+@bot.tree.command(
+    name="help_act",
+    description="Shows all Actor commands."
+)
+@not_blocked()
+@keep_track()
+async def help_act(interaction: discord.Interaction, command: str = None):
 
     embed = discord.Embed(
-        title="🤖 Actor Help Menu",
-        description="Here are all available commands:",
+        title="🤖 Actor Help Center",
+        description="Use `/help_act` or `/help_act command:<name>`",
         color=discord.Color.blurple()
     )
 
-    # ===== FUN =====
+    # ================= FUN =================
     embed.add_field(
-        name="🎮 Fun Commands",
+        name="🎮 Fun",
         value=(
-            "`/ping` - Show bot latency\n"
-            "`/coin` - Flip a coin\n"
-            "`/dice` - Roll a dice\n"
-            "`/8ball` - Ask the magic 8ball\n"
-            "`/random` - Randomly pick an item\n"
-            "`/say` - Make Actor say something"
+            "`/ping` - Bot latency\n"
+            "`/coin` - Flip coin\n"
+            "`/dice` - Roll dice\n"
+            "`/8ball` - Magic answers\n"
+            "`/random` - Pick random item\n"
+            "`/say` - Repeat message"
         ),
         inline=False
     )
 
-    # ===== AI & UTILITY =====
+    # ================= AI =================
     embed.add_field(
         name="🧠 AI & Utility",
         value=(
-            "`/ai` - Ask Actor anything\n"
+            "`/ai` - Chat with Actor\n"
             "`/fact` - Random fact\n"
             "`/joke` - Random joke\n"
-            "`/time` - Current server time\n"
-            "`/timer` - Start a countdown timer\n"
-            "`/remind` - Set a reminder"
+            "`/time` - Current time\n"
+            "`/timer` - Countdown timer\n"
+            "`/remind` - Set reminder"
         ),
         inline=False
     )
 
-    # ===== USER INFO =====
+    # ================= INFO =================
     embed.add_field(
-        name="👤 User Commands",
+        name="👤 Info",
         value=(
-            "`/avatar` - Show avatar\n"
-            "`/profile` - Show profile picture\n"
-            "`/userinfo` - Show user info\n"
-            "`/serverinfo` - Show server info"
+            "`/avatar` - View avatar\n"
+            "`/profile` - Profile picture\n"
+            "`/userinfo` - User info\n"
+            "`/serverinfo` - Server info"
         ),
         inline=False
     )
 
-    # ===== MODERATION =====
+    # ================= MOD =================
     embed.add_field(
         name="🛡️ Moderation",
         value=(
-            "`/ban` - Ban a member\n"
-            "`/unban` - Unban a user\n"
-            "`/mute` - Timeout a member\n"
+            "`/ban` - Ban member\n"
+            "`/unban` - Unban user\n"
+            "`/mute` - Timeout user\n"
             "`/unmute` - Remove timeout\n"
-            "`/warn` - Warn a member\n"
+            "`/warn` - Warn user\n"
             "`/clear` - Delete messages\n"
-            "`/lock` - Lock a channel\n"
-            "`/unlock` - Unlock a channel\n"
-            "`/announcement` - Send announcement\n"
-            "`/report` - Report a user"
+            "`/lock` - Lock channel\n"
+            "`/unlock` - Unlock channel\n"
+            "`/report` - Report user"
         ),
         inline=False
     )
 
-    # ===== OWNER =====
+    # ================= OWNER =================
     embed.add_field(
-        name="👑 Owner Commands",
+        name="👑 Owner",
         value=(
-            "`/block` - Block a user from Actor\n"
-            "`/unblock` - Unblock a user"
+            "`/block` - Block user\n"
+            "`/unblock` - Unblock user\n"
+            "`/act_point` - Give points\n"
+            "`/act_point_view` - View points"
         ),
         inline=False
     )
 
-    # ===== TOTAL =====
-    embed.add_field(
-        name="📦 Total Commands",
-        value="28 Commands Available",
-        inline=False
-    )
-
+    # Footer
     embed.set_footer(
-        text="Actor • Simple • Fast • Human-like"
+        text="Actor • clean • fast • evolving"
     )
 
     embed.timestamp = datetime.datetime.utcnow()
 
-    await interaction.response.send_message(
-        embed=embed
-    )
+    await interaction.response.send_message(embed=embed)
 @bot.tree.command(
     name="userinfo",
     description="Shows information about a user."
