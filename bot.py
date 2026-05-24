@@ -638,7 +638,30 @@ async def time_cmd(interaction: discord.Interaction):
     await interaction.response.send_message(
         f"🕒 {current}"
     )
+@bot.tree.command(
+    name="fhaa",
+    description="Play the legendary FHAA sound in VC"
+)
+async def fhaa(interaction: discord.Interaction):
 
+    if not interaction.user.voice:
+        return await interaction.response.send_message(
+            "❌ You must be in a voice channel first!",
+            ephemeral=True
+        )
+
+    channel = interaction.user.voice.channel
+    voice = await channel.connect()
+
+    await interaction.response.send_message("fahh🔥 (playing in VC)")
+
+    audio_file = discord.FFmpegPCMAudio("fahh.mp3")  # put your file here
+    voice.play(audio_file)
+
+    while voice.is_playing():
+        await asyncio.sleep(1)
+
+    await voice.disconnect()
 # ================= ADMIN COMMANDS ================= #
 @bot.tree.command(
     name="ban",
