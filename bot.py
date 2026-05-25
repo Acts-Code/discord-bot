@@ -1071,12 +1071,6 @@ async def serverinfo(interaction: discord.Interaction):
     description="Shows all Actor commands."
 )
 @not_blocked()
-  
-@bot.tree.command(
-    name="help_act",
-    description="Shows all Actor commands."
-)
-@not_blocked()
 async def help_act(interaction: discord.Interaction, command: str = None):
 
     embed = discord.Embed(
