@@ -3,3 +3,4 @@ firebase-admin
 openai
 PyNaCl
 aiohttp
+ffmpeg
