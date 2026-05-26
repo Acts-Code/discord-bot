@@ -645,24 +645,41 @@ async def fhaa(interaction: discord.Interaction):
         )
 
     channel = interaction.user.voice.channel
-
     voice = interaction.guild.voice_client
 
-    if voice is None:
-        voice = await channel.connect()
+    try:
+        # Connect if not connected
+        if voice is None:
+            voice = await channel.connect()
 
-    await interaction.response.send_message("Fhaa 🔥 (playing in VC)")
+        # Move if in another VC
+        elif voice.channel != channel:
+            await voice.move_to(channel)
 
-    audio_file = discord.FFmpegPCMAudio(
-    "Fahhh - QuickSounds.com.mp3",
-    executable="/usr/bin/ffmpeg"
-)
-    voice.play(audio_file)
+        await interaction.response.send_message(
+            "🔥 FHAA incoming..."
+        )
 
-    while voice.is_playing():
-        await asyncio.sleep(1)
+        # STOP previous audio if already playing
+        if voice.is_playing():
+            voice.stop()
 
-    await voice.disconnect()
+        # AUDIO
+        source = discord.FFmpegPCMAudio(
+            executable="ffmpeg",  # simpler
+            source="Fahhh - QuickSounds.com.mp3"
+        )
+
+        voice.play(source)
+
+        # Wait until done
+        while voice.is_playing():
+            await asyncio.sleep(1)
+
+        await voice.disconnect()
+
+    except Exception as e:
+        await interaction.followup.send(f"❌ Error: {e}")
 # ================= ADMIN COMMANDS ================= #
 @bot.tree.command(
     name="ban",
