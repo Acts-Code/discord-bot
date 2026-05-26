@@ -18,7 +18,7 @@ from ai import ask_ai
 print("ai-ask ai good")
 from urllib.parse import quote_plus
 print("urllib.parse-quote_plus")
-discord.opus.load_opus("libopus.so")
+discord.opus.load_opus("libopus.so.0")
 #============FIREBASE====================#
 from firebase import db
 
