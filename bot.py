@@ -634,51 +634,41 @@ async def time_cmd(interaction: discord.Interaction):
     )
 @bot.tree.command(
     name="fhaa",
-    description="Play the legendary FHAA sound in VC"
+    description="Play FHAA sound"
 )
 async def fhaa(interaction: discord.Interaction):
 
     if not interaction.user.voice:
         return await interaction.response.send_message(
-            "❌ You must be in a voice channel first!",
+            "Join VC first.",
             ephemeral=True
         )
 
     channel = interaction.user.voice.channel
     voice = interaction.guild.voice_client
 
-    try:
-        # Connect if not connected
-        if voice is None:
-            voice = await channel.connect()
+    if voice is None:
+        voice = await channel.connect()
 
-        # Move if in another VC
-        elif voice.channel != channel:
-            await voice.move_to(channel)
+    await interaction.response.send_message("🔥 Playing FHAA...")
 
-        await interaction.response.send_message(
-            "🔥 FHAA incoming..."
-        )
+    import os
 
-        # STOP previous audio if already playing
-        if voice.is_playing():
-            voice.stop()
+    print("FILES:", os.listdir())
 
-        # AUDIO
-        audio_file = discord.FFmpegPCMAudio(
-        "Fahhh - QuickSounds.com.mp3",
-        executable="ffmpeg"
-        )
-        voice.play(source)
+    file_path = "fhaa.mp3"
 
-        # Wait until done
-        while voice.is_playing():
-            await asyncio.sleep(1)
+    print("EXISTS:", os.path.exists(file_path))
 
-        await voice.disconnect()
+    source = discord.FFmpegPCMAudio(
+        executable="ffmpeg",
+        source=file_path
+    )
 
-    except Exception as e:
-        await interaction.followup.send(f"❌ Error: {e}")
+    def after_play(error):
+        print("ERROR:", error)
+
+    voice.play(source, after=after_play)
 # ================= ADMIN COMMANDS ================= #
 @bot.tree.command(
     name="ban",
