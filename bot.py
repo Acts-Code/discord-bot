@@ -636,11 +636,12 @@ async def time_cmd(interaction: discord.Interaction):
     name="fhaa",
     description="Play FHAA sound"
 )
+@not_blocked()
 async def fhaa(interaction: discord.Interaction):
 
     if not interaction.user.voice:
         return await interaction.response.send_message(
-            "Join VC first.",
+            "❌ Join a VC first.",
             ephemeral=True
         )
 
@@ -650,25 +651,21 @@ async def fhaa(interaction: discord.Interaction):
     if voice is None:
         voice = await channel.connect()
 
-    await interaction.response.send_message("🔥 Playing FHAA...")
+    elif voice.channel != channel:
+        await voice.move_to(channel)
 
-    import os
+    await interaction.response.send_message("🔥 FHAA")
 
-    print("FILES:", os.listdir())
-
-    file_path = "fhaa.mp3"
-
-    print("EXISTS:", os.path.exists(file_path))
-
-    source = discord.FFmpegPCMAudio(
-        executable="ffmpeg",
-        source=file_path
+    source = discord.FFmpegOpusAudio(
+        "fhaa.wav"
     )
 
-    def after_play(error):
-        print("ERROR:", error)
+    voice.play(source)
 
-    voice.play(source, after=after_play)
+    while voice.is_playing():
+        await asyncio.sleep(1)
+
+    await voice.disconnect()
 # ================= ADMIN COMMANDS ================= #
 @bot.tree.command(
     name="ban",
