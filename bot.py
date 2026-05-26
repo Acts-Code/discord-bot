@@ -665,11 +665,10 @@ async def fhaa(interaction: discord.Interaction):
             voice.stop()
 
         # AUDIO
-        source = discord.FFmpegPCMAudio(
-            executable="ffmpeg",  # simpler
-            source="Fahhh - QuickSounds.com.mp3"
+        audio_file = discord.FFmpegPCMAudio(
+        "Fahhh - QuickSounds.com.mp3",
+        executable="ffmpeg"
         )
-
         voice.play(source)
 
         # Wait until done
