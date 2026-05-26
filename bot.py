@@ -656,10 +656,7 @@ async def fhaa(interaction: discord.Interaction):
 
     await interaction.response.send_message("🔥 FHAA")
 
-    source = discord.FFmpegOpusAudio(
-        "fhaa.wav"
-    )
-
+    source = discord.FFmpegPCMAudio("fhaa.wav")
     voice.play(source)
 
     while voice.is_playing():
