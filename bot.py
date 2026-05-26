@@ -646,11 +646,17 @@ async def fhaa(interaction: discord.Interaction):
 
     channel = interaction.user.voice.channel
 
-    voice = await channel.connect()  # ✅ INSIDE async function
+    voice = interaction.guild.voice_client
 
-    await interaction.response.send_message("fahh🔥 (playing in VC)")
+    if voice is None:
+        voice = await channel.connect()
 
-    audio_file = discord.FFmpegPCMAudio("Fahhh - QuickSounds.com.mp3")
+    await interaction.response.send_message("Fhaa 🔥 (playing in VC)")
+
+    audio_file = discord.FFmpegPCMAudio(
+    "Fahhh - QuickSounds.com.mp3",
+    executable="/usr/bin/ffmpeg"
+)
     voice.play(audio_file)
 
     while voice.is_playing():
