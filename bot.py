@@ -18,7 +18,6 @@ from ai import ask_ai
 print("ai-ask ai good")
 from urllib.parse import quote_plus
 print("urllib.parse-quote_plus")
-discord.opus.load_opus("libopus.so.0")
 #============FIREBASE====================#
 from firebase import db
 
@@ -657,7 +656,7 @@ async def fhaa(interaction: discord.Interaction):
 
     await interaction.response.send_message("🔥 FHAA")
 
-    source = discord.FFmpegPCMAudio("fhaa.wav")
+    source = discord.FFmpegOpusAudio("fhaa.wav")
     voice.play(source)
 
     while voice.is_playing():
