@@ -1137,7 +1137,7 @@ async def help_act(interaction: discord.Interaction, command: str = None):
 
     embed = discord.Embed(
         title="🤖 Actor Help Center",
-        description="Use `/help_act` or `/help_act command:<name>`",
+        description="Use `/help_act`",
         color=discord.Color.blurple()
     )
 
