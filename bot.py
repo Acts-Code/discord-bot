@@ -46,6 +46,7 @@ INACTIVE_TIME = 2700  # 45 minutAes
 BANNED_USER_IDS = set()
 OWNER_ID =1407707442569285858
 REPORT_CHANNEL_ID = 1502949484445958174
+WARN_CHANNEL_ID = 1509522076057206967
 # ================= ADMIN ROLES ================= #
 ADMIN_ROLE_IDS = [
     1489157059487334482,
@@ -815,7 +816,6 @@ async def unlock(interaction: discord.Interaction):
     description="Warn a member."
 )
 @not_blocked()
-  
 async def warn(interaction: discord.Interaction, member: discord.Member, reason: str):
 
     if not is_admin(interaction):
@@ -824,8 +824,22 @@ async def warn(interaction: discord.Interaction, member: discord.Member, reason:
             ephemeral=True
         )
 
+    if member == interaction.user:
+        return await interaction.response.send_message(
+            "❌ You cannot warn yourself.",
+            ephemeral=True
+        )
+
+    channel = bot.get_channel(WARN_CHANNEL_ID)
+
+    if not channel:
+        return await interaction.response.send_message(
+            "❌ Warn channel not found.",
+            ephemeral=True
+        )
+
     embed = discord.Embed(
-        title="⚠️ Warning Issued",
+        title="⚠️ User Warned",
         color=discord.Color.orange()
     )
 
@@ -833,7 +847,21 @@ async def warn(interaction: discord.Interaction, member: discord.Member, reason:
     embed.add_field(name="Reason", value=reason, inline=False)
     embed.add_field(name="Moderator", value=interaction.user.mention, inline=False)
 
-    await interaction.response.send_message(embed=embed)    
+    embed.timestamp = datetime.datetime.utcnow()
+
+    await channel.send(embed=embed)
+
+    await interaction.response.send_message(
+        f"⚠️ Warned {member.mention} (logged in mod channel)",
+        ephemeral=True
+    )
+
+    try:
+        await member.send(
+            f"⚠️ You were warned in **{interaction.guild.name}**\nReason: {reason}"
+        )
+    except:
+        pass
 @bot.tree.command(
     name="clear",
     description="Delete a number of messages."
