@@ -46,7 +46,7 @@ INACTIVE_TIME = 2700  # 45 minutAes
 BANNED_USER_IDS = set()
 OWNER_ID =1407707442569285858
 REPORT_CHANNEL_ID = 1502949484445958174
-WARN_CHANNEL_ID = 1509522076057206967
+WARN_CHANNEL_ID = 1509528647822868550
 # ================= ADMIN ROLES ================= #
 ADMIN_ROLE_IDS = [
     1489157059487334482,
@@ -288,6 +288,9 @@ async def on_ready():
     if not hasattr(bot, "inactive_task_started"):
         bot.inactive_task_started = True
         asyncio.create_task(check_inactive())
+    if not hasattr(bot, "mood_started"):
+        bot.mood_started = True
+        asyncio.create_task(mood_scanner())
 # ================= MESSAGE TRACKING ================= #
 
 last_message_time = None
@@ -1401,5 +1404,95 @@ async def on_member_join(member):
     except Exception as e:
         print("Welcome error:", e)
 print("yah running")
+#=================AI MOOD THING==========#
+@bot.event
+async def on_message(message):
+
+    if message.author.bot:
+        return
+
+    uid = str(message.author.id)
+    ref = db.collection("mood_data").document(uid)
+
+    doc = ref.get()
+    data = doc.to_dict() if doc.exists else {
+        "msgs": 0,
+        "caps": 0,
+        "spam": 0
+    }
+
+    content = message.content
+
+    data["msgs"] += 1
+
+    if content.isupper() and len(content) > 5:
+        data["caps"] += 1
+
+    if len(content) > 100:
+        data["spam"] += 1
+
+    ref.set(data)
+
+    await bot.process_commands(message)
+async def get_mood_from_ai(summary: str):
+
+    prompt = (
+        "You are a mood analyzer.\n"
+        "Return ONLY one word mood and one emoji.\n"
+        "Format: mood emoji\n\n"
+        f"Data: {summary}"
+    )
+
+    result = await ask_ai(None, prompt)
+
+    try:
+        parts = result.strip().split()
+        return parts[0], parts[1]
+    except:
+        return "neutral", "😐"
+async def mood_scanner():
+    await bot.wait_until_ready()
+
+    while not bot.is_closed():
+        await asyncio.sleep(300)  # 5 minutes
+
+        users = db.collection("mood_data").stream()
+
+        for doc in users:
+            uid = doc.id
+            data = doc.to_dict()
+
+            summary = (
+                f"messages={data.get('msgs',0)}, "
+                f"caps={data.get('caps',0)}, "
+                f"spam={data.get('spam',0)}"
+            )
+
+            mood, emoji = await get_mood_from_ai(summary)
+
+            db.collection("mood_data").document(uid).set({
+                **data,
+                "mood": mood,
+                "emoji": emoji,
+                "msgs": 0,
+                "caps": 0,
+                "spam": 0,
+                "updated": str(datetime.datetime.utcnow())
+            })
+@bot.tree.command(name="mood_see")
+async def mood_see(interaction: discord.Interaction, member: discord.Member = None):
+
+    member = member or interaction.user
+
+    doc = db.collection("mood_data").document(str(member.id)).get()
+
+    if not doc.exists:
+        return await interaction.response.send_message("No mood data yet.")
+
+    data = doc.to_dict()
+
+    await interaction.response.send_message(
+        f"{data.get('emoji','😐')} {member.name}: {data.get('mood','neutral')}"
+    )
 # ================= RUN ================= #
 bot.run(TOKEN)
