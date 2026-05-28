@@ -411,10 +411,76 @@ async def ball(interaction: discord.Interaction, question: str):
     await interaction.response.send_message(
         random.choice(answers)
     )
+from discord import app_commands
+
+COLOR_LIST = {
+    "red": discord.Color.red(),
+    "blue": discord.Color.blue(),
+    "green": discord.Color.green(),
+    "gold": discord.Color.gold(),
+    "purple": discord.Color.purple(),
+    "pink": discord.Color.magenta(),
+    "black": discord.Color.default(),
+    "orange": discord.Color.orange(),
+    "teal": discord.Color.teal(),
+    "yellow": discord.Color.yellow(),
+    "dark_blue": discord.Color.dark_blue(),
+    "dark_red": discord.Color.dark_red(),
+    "dark_green": discord.Color.dark_green(),
+    "dark_purple": discord.Color.dark_purple(),
+    "dark_gold": discord.Color.dark_gold(),
+    "light_grey": discord.Color.light_grey(),
+    "lighter_grey": discord.Color.lighter_grey(),
+    "dark_grey": discord.Color.dark_grey(),
+    "darker_grey": discord.Color.darker_grey(),
+    "blurple": discord.Color.blurple(),
+    "fuchsia": discord.Color.fuchsia(),
+    "brand_red": discord.Color.brand_red(),
+    "brand_green": discord.Color.brand_green(),
+    "brand_blue": discord.Color.brand_blue(),
+    "white": discord.Color.from_rgb(255,255,255),
+    "cyan": discord.Color.from_rgb(0,255,255),
+    "lime": discord.Color.from_rgb(0,255,0),
+    "navy": discord.Color.from_rgb(0,0,128),
+    "maroon": discord.Color.from_rgb(128,0,0),
+    "olive": discord.Color.from_rgb(128,128,0),
+    "silver": discord.Color.from_rgb(192,192,192),
+    "aqua": discord.Color.from_rgb(0,255,255),
+    "violet": discord.Color.from_rgb(238,130,238),
+    "indigo": discord.Color.from_rgb(75,0,130),
+    "brown": discord.Color.from_rgb(139,69,19),
+    "crimson": discord.Color.from_rgb(220,20,60),
+    "coral": discord.Color.from_rgb(255,127,80),
+    "salmon": discord.Color.from_rgb(250,128,114),
+    "khaki": discord.Color.from_rgb(240,230,140),
+    "plum": discord.Color.from_rgb(221,160,221),
+    "orchid": discord.Color.from_rgb(218,112,214),
+    "turquoise": discord.Color.from_rgb(64,224,208),
+    "mint": discord.Color.from_rgb(152,255,152),
+    "peach": discord.Color.from_rgb(255,218,185),
+    "lavender": discord.Color.from_rgb(230,230,250),
+    "beige": discord.Color.from_rgb(245,245,220),
+    "ivory": discord.Color.from_rgb(255,255,240),
+    "charcoal": discord.Color.from_rgb(54,69,79),
+    "sky_blue": discord.Color.from_rgb(135,206,235),
+    "hot_pink": discord.Color.from_rgb(255,105,180),
+}
+
+async def color_autocomplete(
+    interaction: discord.Interaction,
+    current: str
+):
+    return [
+        app_commands.Choice(name=color, value=color)
+        for color in COLOR_LIST.keys()
+        if current.lower() in color.lower()
+    ][:25]
+
 @bot.tree.command(
     name="embed",
     description="Send a custom embed message."
 )
+@app_commands.autocomplete(color=color_autocomplete)
 async def embed(
     interaction: discord.Interaction,
     title: str,
@@ -422,20 +488,10 @@ async def embed(
     color: str = "blue"
 ):
 
-    colors = {
-        "red": discord.Color.red(),
-        "blue": discord.Color.blue(),
-        "green": discord.Color.green(),
-        "gold": discord.Color.gold(),
-        "purple": discord.Color.purple(),
-        "pink": discord.Color.magenta(),
-        "black": discord.Color.default()
-    }
-
     embed = discord.Embed(
         title=title,
         description=message,
-        color=colors.get(color.lower(), discord.Color.blue())
+        color=COLOR_LIST.get(color.lower(), discord.Color.blue())
     )
 
     embed.set_footer(
@@ -448,7 +504,7 @@ async def embed(
     await interaction.response.send_message(embed=embed)
 @bot.tree.command(
     name="random",
-    description="Randomly pick something from a list.(Separate iteams using comma)"
+    description="Randomly pick something from a list.(Separate items using comma)"
 )
 @not_blocked()
   
@@ -1109,6 +1165,7 @@ async def help_act(interaction: discord.Interaction, command: str = None):
             "`/time` - Current time\n"
             "`/timer` - Countdown timer\n"
             "`/remind` - Set reminder"
+            "`/embed` - Send custom embeds\n"
         ),
         inline=False
     )
@@ -1138,6 +1195,7 @@ async def help_act(interaction: discord.Interaction, command: str = None):
             "`/lock` - Lock channel\n"
             "`/unlock` - Unlock channel\n"
             "`/report` - Report user"
+            "`/announcement` - Send server announcement\n"
         ),
         inline=False
     )
@@ -1150,10 +1208,18 @@ async def help_act(interaction: discord.Interaction, command: str = None):
             "`/unblock` - Unblock user\n"
             "`/act_point` - Give points\n"
             "`/act_point_view` - View points"
+            "`/track_view` - View command stats\n"
         ),
         inline=False
     )
-
+    embed.add_field(
+        name="🔊 Voice commands",
+        value=(
+            "`/fhaa` - Play the fhaa sound in VC"
+        ),
+        inline=False
+    )
+    
     # Footer
     embed.set_footer(
         text="Actor • clean • fast • evolving"
