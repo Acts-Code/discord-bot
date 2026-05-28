@@ -437,7 +437,7 @@ COLOR_LIST = {
     "fuchsia": discord.Color.fuchsia(),
     "brand_red": discord.Color.brand_red(),
     "brand_green": discord.Color.brand_green(),
-    "brand_blue": discord.Color.brand_blue(),
+    "brand_blue": discord.Color.from_rgb(88, 101, 242),
     "white": discord.Color.from_rgb(255,255,255),
     "cyan": discord.Color.from_rgb(0,255,255),
     "lime": discord.Color.from_rgb(0,255,0),
