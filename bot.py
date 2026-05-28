@@ -1197,6 +1197,7 @@ async def help_act(interaction: discord.Interaction, command: str = None):
             "`/timer` - Countdown timer\n"
             "`/remind` - Set reminder"
             "`/embed` - Send custom embeds\n"
+            "`/mood_see` - See a user's mood scanned by AI (Scans every 5 minutes)\n"
         ),
         inline=False
     )
@@ -1479,7 +1480,10 @@ async def mood_scanner():
                 "spam": 0,
                 "updated": str(datetime.datetime.utcnow())
             })
-@bot.tree.command(name="mood_see")
+@bot.tree.command(
+    name="mood_see",
+    description="See a user's mood."
+                 )
 async def mood_see(interaction: discord.Interaction, member: discord.Member = None):
 
     member = member or interaction.user
