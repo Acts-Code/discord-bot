@@ -15,7 +15,7 @@ from discord.ext import commands
 print("discord.ext- commands good")
 from discord import app_commands
 print("discord- app_commands good")
-from ai import ask_ai,ask_code
+from ai import ask_ai
 print("ai-ask ai good")
 from urllib.parse import quote_plus
 print("urllib.parse-quote_plus")
@@ -93,7 +93,7 @@ async def on_app_command_completion(interaction: discord.Interaction, command):
             "total_commands": data.get("total_commands", 0) + 1,
             "commands": commands,
             "last_command": command_name,
-            "last_used": datetime.datetime.utcnow().isoformat()
+            "last_used": datetime.datetime.now(datetime.timezone.utc).isoformat()
         })
 
     except Exception as e:
@@ -1204,22 +1204,6 @@ async def on_member_join(member):
 
     except Exception as e:
         print("Welcome error:", e)
-
-@bot.tree.command(
-    name="code",
-    description="Generate code using AI"
-)
-@not_blocked()
-async def code(interaction: discord.Interaction, prompt: str):
-
-    await interaction.response.defer()
-
-    try:
-        reply = await ask_code(interaction.user.id, prompt)
-    except Exception:
-        reply = "⚠️ Code AI is currently unavailable."
-
-    await interaction.followup.send(f"```python\n{reply}\n```")
 print("yah running")
 # ================= RUN ================= #
 bot.run(TOKEN)
