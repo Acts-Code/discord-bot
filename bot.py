@@ -41,19 +41,23 @@ print("Firebase connected!")
 TOKEN = os.getenv("TOKEN")
 # ================= SETTINGS ================= #
 MONITORED_CHANNEL_ID = 1481723127703797793
-WELCOME_CHANNEL_ID = 1502928422438178856
 INACTIVE_TIME = 2700  # 45 minutAes
 BANNED_USER_IDS = set()
 OWNER_ID =1407707442569285858
-REPORT_CHANNEL_ID = 1502949484445958174
-WARN_CHANNEL_ID = 1509528647822868550
+REPORT_CHANNEL_ID = 1515190855500300338
+WARN_CHANNEL_ID = 1515191851894702201
 # ================= ADMIN ROLES ================= #
 ADMIN_ROLE_IDS = [
-    1489157059487334482,
-    1489156996421914808,
-    1485995037509812324,
-    1484279764922667008,
-    1492620579713323070
+    1510192537095110736,
+    1513424532562509895,
+    1510106454881861763,
+    1510106454881861763,
+    1510193164604932336,
+    1513481350802444368,
+    1513481258401796168,
+    1510195358301552703,
+    1510192968563167293,
+    1510195420784230400
 ]
 
 #=============OWNERONLY HELPER============#
@@ -1371,39 +1375,7 @@ async def remind(
         f"📝 {interaction.user.mention} Reminder:\n{reminder}"
     )
     
-@bot.event
-async def on_member_join(member):
 
-    channel = bot.get_channel(WELCOME_CHANNEL_ID)
-
-    if not channel:
-        return
-
-    try:
-
-        welcome_url = (
-            f"https://api.popcat.xyz/welcomecard?"
-            f"background=https://i.imgur.com/5FL6qEm.png"
-            f"&text1={quote_plus(member.name)}"
-            f"&text2={quote_plus(f'Welcome to {member.guild.name}')}"
-            f"&text3={quote_plus(f'Member #{member.guild.member_count}')}"
-            f"&avatar={quote_plus(member.display_avatar.url)}"
-        )
-
-        print(welcome_url)
-
-        embed = discord.Embed(
-            title="👋 Welcome!",
-            description=f"{member.mention} joined the server.",
-            color=discord.Color.blurple()
-        )
-
-        embed.set_image(url=welcome_url)
-
-        await channel.send(embed=embed)
-
-    except Exception as e:
-        print("Welcome error:", e)
 print("yah running")
 #=================AI MOOD THING==========#
 @bot.event
