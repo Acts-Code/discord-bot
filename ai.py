@@ -1,60 +1,61 @@
-import aiohttp
 import os
+import aiohttp
 
 OPENROUTER_API_KEY = os.getenv("AI_API_KEY")
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
-async def ask_ai(user_id: int, question: str):
+HEADERS = {
+    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+    "Content-Type": "application/json",
+}
 
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://discord.com",
-        "X-Title": "Actor Bot"
-    }
 
-    payload = {
-        "model": "meta-llama/llama-3.3-70b-instruct:free",
-        "messages": [
-            {"role": "system", "content": "You are Actor AI, a helpful Discord assistant."},
-            {"role": "user", "content": question}
-        ]
-    }
+async def ask_ai(user_id: int, prompt: str):
+    return await _call_model(
+        model="meta-llama/llama-3.3-70b-instruct:free",
+        prompt=prompt
+    )
 
-    async with aiohttp.ClientSession() as session:
-        async with session.post(OPENROUTER_URL, json=payload, headers=headers) as resp:
-            data = await resp.json()
 
-            try:
-                return data["choices"][0]["message"]["content"]
-            except:
-                return "⚠️ AI error: no response"
 async def ask_code(user_id: int, prompt: str):
+    return await _call_model(
+        model="nvidia/nemotron-3-ultra-550b-a55b:free",
+        prompt=prompt
+    )
 
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://discord.com",
-        "X-Title": "Actor Bot"
-    }
+
+async def _call_model(model: str, prompt: str):
+    if not OPENROUTER_API_KEY:
+        return "❌ Missing OPENROUTER_API_KEY"
 
     payload = {
-        "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "model": model,
         "messages": [
             {
                 "role": "system",
-                "content": "You are a senior programmer. Output ONLY clean code. No explanation."
+                "content": "You are a helpful assistant. Keep responses clear and useful."
             },
-            {"role": "user", "content": prompt}
-        ]
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "temperature": 0.7,
+        "max_tokens": 800
     }
 
-    async with aiohttp.ClientSession() as session:
-        async with session.post(OPENROUTER_URL, json=payload, headers=headers) as resp:
-            data = await resp.json()
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(API_URL, json=payload, headers=HEADERS) as resp:
+                data = await resp.json()
 
-            try:
+                # Debug print (VERY IMPORTANT)
+                print("OPENROUTER RESPONSE:", data)
+
                 return data["choices"][0]["message"]["content"]
-            except:
-                return "⚠️ Code AI error"
+
+    except Exception as e:
+        print("OPENROUTER ERROR:", e)
+        return f"⚠️ API error: {e}"
