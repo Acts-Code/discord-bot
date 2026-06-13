@@ -357,14 +357,18 @@ async def ping(interaction: discord.Interaction):
     description="Ask Actor anything"
 )
 @not_blocked()
-  
 async def ai(interaction: discord.Interaction, question: str):
 
     await interaction.response.defer()
+
     try:
         reply = await ask_ai(interaction.user.id, question)
-    except Exception:
-        reply = "⚠️ AI is currently unavailable."
+        print("AI RESPONSE:", reply)
+
+    except Exception as e:
+        print("AI ERROR:", e)
+        reply = f"⚠️ AI error: {e}"
+
     await interaction.followup.send(reply)
 
 @bot.tree.command(
