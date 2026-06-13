@@ -1,4 +1,5 @@
 import discord
+from discord import channel
 print("discord is good")
 import random
 print("random good")
@@ -14,7 +15,7 @@ from discord.ext import commands
 print("discord.ext- commands good")
 from discord import app_commands
 print("discord- app_commands good")
-from ai import ask_ai
+from ai import ask_ai,ask_code
 print("ai-ask ai good")
 from urllib.parse import quote_plus
 print("urllib.parse-quote_plus")
@@ -32,32 +33,29 @@ def add_rep(user_id, amount):
     else:
         current = 0
 
-    ref.set({
-        "rep": current + amount
-    })
+    ref.set(
+    {"rep": current + amount},
+    merge=True
+)
+
 
 print("Firebase connected!")
 # ================= TOKENS ================= #
 TOKEN = os.getenv("TOKEN")
 # ================= SETTINGS ================= #
 MONITORED_CHANNEL_ID = 1481723127703797793
+WELCOME_CHANNEL_ID = 1502928422438178856
 INACTIVE_TIME = 2700  # 45 minutAes
 BANNED_USER_IDS = set()
 OWNER_ID =1407707442569285858
-REPORT_CHANNEL_ID = 1515190855500300338
-WARN_CHANNEL_ID = 1515191851894702201
+REPORT_CHANNEL_ID = 1502949484445958174
 # ================= ADMIN ROLES ================= #
 ADMIN_ROLE_IDS = [
-    1510192537095110736,
-    1513424532562509895,
-    1510106454881861763,
-    1510106454881861763,
-    1510193164604932336,
-    1513481350802444368,
-    1513481258401796168,
-    1510195358301552703,
-    1510192968563167293,
-    1510195420784230400
+    1489157059487334482,
+    1489156996421914808,
+    1485995037509812324,
+    1484279764922667008,
+    1492620579713323070
 ]
 
 #=============OWNERONLY HELPER============#
@@ -292,12 +290,7 @@ async def on_ready():
     if not hasattr(bot, "inactive_task_started"):
         bot.inactive_task_started = True
         asyncio.create_task(check_inactive())
-    if not hasattr(bot, "mood_started"):
-        bot.mood_started = True
-        asyncio.create_task(mood_scanner())
 # ================= MESSAGE TRACKING ================= #
-
-last_message_time = None
 
 @bot.event
 async def on_message(message):
@@ -342,15 +335,10 @@ async def check_inactive():
             - last_message_time
         )
 
-        if inactive_for > INACTIVE_TIME:
+        if inactive_for > INACTIVE_TIME and not getattr(bot, "inactive_sent", False):
+            await channel.send(random.choice(msgs))
+            bot.inactive_sent = True
 
-            channel = bot.get_channel(1481723127703797793)
-
-            if channel:
-                await channel.send(random.choice(msgs))
-
-                # RESET TIMER
-                last_message_time = asyncio.get_event_loop().time()
 # ================= BASIC COMMANDS ================= #
 
 @bot.tree.command(
@@ -373,10 +361,12 @@ async def ping(interaction: discord.Interaction):
 async def ai(interaction: discord.Interaction, question: str):
 
     await interaction.response.defer()
-
-    reply = await ask_ai(interaction.user.id, question)
-
+    try:
+        reply = await ask_ai(interaction.user.id, question)
+    except Exception:
+        reply = "⚠️ AI is currently unavailable."
     await interaction.followup.send(reply)
+
 @bot.tree.command(
     name="coin",
     description="Flip a coin."
@@ -419,76 +409,10 @@ async def ball(interaction: discord.Interaction, question: str):
     await interaction.response.send_message(
         random.choice(answers)
     )
-from discord import app_commands
-
-COLOR_LIST = {
-    "red": discord.Color.red(),
-    "blue": discord.Color.blue(),
-    "green": discord.Color.green(),
-    "gold": discord.Color.gold(),
-    "purple": discord.Color.purple(),
-    "pink": discord.Color.magenta(),
-    "black": discord.Color.default(),
-    "orange": discord.Color.orange(),
-    "teal": discord.Color.teal(),
-    "yellow": discord.Color.yellow(),
-    "dark_blue": discord.Color.dark_blue(),
-    "dark_red": discord.Color.dark_red(),
-    "dark_green": discord.Color.dark_green(),
-    "dark_purple": discord.Color.dark_purple(),
-    "dark_gold": discord.Color.dark_gold(),
-    "light_grey": discord.Color.light_grey(),
-    "lighter_grey": discord.Color.lighter_grey(),
-    "dark_grey": discord.Color.dark_grey(),
-    "darker_grey": discord.Color.darker_grey(),
-    "blurple": discord.Color.blurple(),
-    "fuchsia": discord.Color.fuchsia(),
-    "brand_red": discord.Color.brand_red(),
-    "brand_green": discord.Color.brand_green(),
-    "brand_blue": discord.Color.from_rgb(88, 101, 242),
-    "white": discord.Color.from_rgb(255,255,255),
-    "cyan": discord.Color.from_rgb(0,255,255),
-    "lime": discord.Color.from_rgb(0,255,0),
-    "navy": discord.Color.from_rgb(0,0,128),
-    "maroon": discord.Color.from_rgb(128,0,0),
-    "olive": discord.Color.from_rgb(128,128,0),
-    "silver": discord.Color.from_rgb(192,192,192),
-    "aqua": discord.Color.from_rgb(0,255,255),
-    "violet": discord.Color.from_rgb(238,130,238),
-    "indigo": discord.Color.from_rgb(75,0,130),
-    "brown": discord.Color.from_rgb(139,69,19),
-    "crimson": discord.Color.from_rgb(220,20,60),
-    "coral": discord.Color.from_rgb(255,127,80),
-    "salmon": discord.Color.from_rgb(250,128,114),
-    "khaki": discord.Color.from_rgb(240,230,140),
-    "plum": discord.Color.from_rgb(221,160,221),
-    "orchid": discord.Color.from_rgb(218,112,214),
-    "turquoise": discord.Color.from_rgb(64,224,208),
-    "mint": discord.Color.from_rgb(152,255,152),
-    "peach": discord.Color.from_rgb(255,218,185),
-    "lavender": discord.Color.from_rgb(230,230,250),
-    "beige": discord.Color.from_rgb(245,245,220),
-    "ivory": discord.Color.from_rgb(255,255,240),
-    "charcoal": discord.Color.from_rgb(54,69,79),
-    "sky_blue": discord.Color.from_rgb(135,206,235),
-    "hot_pink": discord.Color.from_rgb(255,105,180),
-}
-
-async def color_autocomplete(
-    interaction: discord.Interaction,
-    current: str
-):
-    return [
-        app_commands.Choice(name=color, value=color)
-        for color in COLOR_LIST.keys()
-        if current.lower() in color.lower()
-    ][:25]
-
 @bot.tree.command(
     name="embed",
     description="Send a custom embed message."
 )
-@app_commands.autocomplete(color=color_autocomplete)
 async def embed(
     interaction: discord.Interaction,
     title: str,
@@ -496,10 +420,20 @@ async def embed(
     color: str = "blue"
 ):
 
+    colors = {
+        "red": discord.Color.red(),
+        "blue": discord.Color.blue(),
+        "green": discord.Color.green(),
+        "gold": discord.Color.gold(),
+        "purple": discord.Color.purple(),
+        "pink": discord.Color.magenta(),
+        "black": discord.Color.default()
+    }
+
     embed = discord.Embed(
         title=title,
         description=message,
-        color=COLOR_LIST.get(color.lower(), discord.Color.blue())
+        color=colors.get(color.lower(), discord.Color.blue())
     )
 
     embed.set_footer(
@@ -512,7 +446,7 @@ async def embed(
     await interaction.response.send_message(embed=embed)
 @bot.tree.command(
     name="random",
-    description="Randomly pick something from a list.(Separate items using comma)"
+    description="Randomly pick something from a list.(Separate iteams using comma)"
 )
 @not_blocked()
   
@@ -698,35 +632,29 @@ async def time_cmd(interaction: discord.Interaction):
     )
 @bot.tree.command(
     name="fhaa",
-    description="Play FHAA sound"
+    description="Play the legendary FHAA sound in VC"
 )
-@not_blocked()
 async def fhaa(interaction: discord.Interaction):
 
     if not interaction.user.voice:
         return await interaction.response.send_message(
-            "❌ Join a VC first.",
+            "❌ You must be in a voice channel first!",
             ephemeral=True
         )
 
     channel = interaction.user.voice.channel
-    voice = interaction.guild.voice_client
 
-    if voice is None:
+    voice = discord.utils.get(bot.voice_clients, guild=interaction.guild)
+    if not voice:
         voice = await channel.connect()
+    try:
+        voice.play(discord.FFmpegPCMAudio("Fahhh - QuickSounds.com.mp3"))
+        while voice.is_playing():
+            await asyncio.sleep(1)
+    finally:
+        if voice and voice.is_connected():
+            await voice.disconnect()
 
-    elif voice.channel != channel:
-        await voice.move_to(channel)
-
-    await interaction.response.send_message("🔥 FHAA")
-
-    source = discord.FFmpegOpusAudio("fhaa.wav")
-    voice.play(source)
-
-    while voice.is_playing():
-        await asyncio.sleep(1)
-
-    await voice.disconnect()
 # ================= ADMIN COMMANDS ================= #
 @bot.tree.command(
     name="ban",
@@ -823,6 +751,7 @@ async def unlock(interaction: discord.Interaction):
     description="Warn a member."
 )
 @not_blocked()
+  
 async def warn(interaction: discord.Interaction, member: discord.Member, reason: str):
 
     if not is_admin(interaction):
@@ -831,22 +760,8 @@ async def warn(interaction: discord.Interaction, member: discord.Member, reason:
             ephemeral=True
         )
 
-    if member == interaction.user:
-        return await interaction.response.send_message(
-            "❌ You cannot warn yourself.",
-            ephemeral=True
-        )
-
-    channel = bot.get_channel(WARN_CHANNEL_ID)
-
-    if not channel:
-        return await interaction.response.send_message(
-            "❌ Warn channel not found.",
-            ephemeral=True
-        )
-
     embed = discord.Embed(
-        title="⚠️ User Warned",
+        title="⚠️ Warning Issued",
         color=discord.Color.orange()
     )
 
@@ -854,21 +769,7 @@ async def warn(interaction: discord.Interaction, member: discord.Member, reason:
     embed.add_field(name="Reason", value=reason, inline=False)
     embed.add_field(name="Moderator", value=interaction.user.mention, inline=False)
 
-    embed.timestamp = datetime.datetime.utcnow()
-
-    await channel.send(embed=embed)
-
-    await interaction.response.send_message(
-        f"⚠️ Warned {member.mention} (logged in mod channel)",
-        ephemeral=True
-    )
-
-    try:
-        await member.send(
-            f"⚠️ You were warned in **{interaction.guild.name}**\nReason: {reason}"
-        )
-    except:
-        pass
+    await interaction.response.send_message(embed=embed)    
 @bot.tree.command(
     name="clear",
     description="Delete a number of messages."
@@ -1038,100 +939,6 @@ async def report(
         "✅ Report sent to staff.",
         ephemeral=True
     )
-    # ================= ADMIN CHECK ================= #
-    if not is_admin(interaction):
-        return await interaction.response.send_message(
-            "❌ Admin only",
-            ephemeral=True
-        )
-
-    # prevent warning yourself
-    if member == interaction.user:
-        return await interaction.response.send_message(
-            "❌ You cannot warn yourself.",
-            ephemeral=True
-        )
-
-    try:
-
-        embed = discord.Embed(
-            title="⚠️ Warning Issued",
-            color=discord.Color.orange()
-        )
-
-        embed.add_field(
-            name="👤 User",
-            value=member.mention,
-            inline=False
-        )
-
-        embed.add_field(
-            name="📝 Reason",
-            value=reason,
-            inline=False
-        )
-
-        embed.add_field(
-            name="🛡️ Moderator",
-            value=interaction.user.mention,
-            inline=False
-        )
-
-        embed.timestamp = datetime.datetime.utcnow()
-
-        # send in current channel
-        await interaction.response.send_message(
-            embed=embed
-        )
-
-        # optional DM to warned user
-        try:
-            await member.send(
-                f"⚠️ You were warned in **{interaction.guild.name}**\nReason: {reason}"
-            )
-        except:
-            pass
-
-    except Exception as e:
-
-        await interaction.response.send_message(
-            f"❌ Failed: {e}",
-            ephemeral=True
-        )
-
-@bot.tree.command(
-    name="unmute",
-    description="Remove timeout from a member."
-)
-@not_blocked()
-  
-async def unmute(
-    interaction: discord.Interaction,
-    member: discord.Member
-):
-
-    if not is_admin(interaction):
-
-        return await interaction.response.send_message(
-            "❌ Admin only",
-            ephemeral=True
-        )
-
-    try:
-
-        await member.timeout(None)
-
-        await interaction.response.send_message(
-            f"🔊 Unmuted {member.mention}"
-        )
-
-    except Exception as e:
-
-        await interaction.response.send_message(
-            f"❌ Failed to unmute: {e}",
-            ephemeral=True
-        )
-
 # ================= INFO COMMANDS ================= #
 
 @bot.tree.command(
@@ -1172,7 +979,7 @@ async def help_act(interaction: discord.Interaction, command: str = None):
 
     embed = discord.Embed(
         title="🤖 Actor Help Center",
-        description="Use `/help_act`",
+        description="Use `/help_act` or `/help_act command:<name>`",
         color=discord.Color.blurple()
     )
 
@@ -1200,8 +1007,6 @@ async def help_act(interaction: discord.Interaction, command: str = None):
             "`/time` - Current time\n"
             "`/timer` - Countdown timer\n"
             "`/remind` - Set reminder"
-            "`/embed` - Send custom embeds\n"
-            "`/mood_see` - See a user's mood scanned by AI (Scans every 5 minutes)\n"
         ),
         inline=False
     )
@@ -1231,7 +1036,6 @@ async def help_act(interaction: discord.Interaction, command: str = None):
             "`/lock` - Lock channel\n"
             "`/unlock` - Unlock channel\n"
             "`/report` - Report user"
-            "`/announcement` - Send server announcement\n"
         ),
         inline=False
     )
@@ -1244,18 +1048,10 @@ async def help_act(interaction: discord.Interaction, command: str = None):
             "`/unblock` - Unblock user\n"
             "`/act_point` - Give points\n"
             "`/act_point_view` - View points"
-            "`/track_view` - View command stats\n"
         ),
         inline=False
     )
-    embed.add_field(
-        name="🔊 Voice commands",
-        value=(
-            "`/fhaa` - Play the fhaa sound in VC"
-        ),
-        inline=False
-    )
-    
+
     # Footer
     embed.set_footer(
         text="Actor • clean • fast • evolving"
@@ -1375,100 +1171,55 @@ async def remind(
         f"📝 {interaction.user.mention} Reminder:\n{reminder}"
     )
     
-
-print("yah running")
-#=================AI MOOD THING==========#
 @bot.event
-async def on_message(message):
+async def on_member_join(member):
 
-    if message.author.bot:
+    channel = bot.get_channel(WELCOME_CHANNEL_ID)
+
+    if not channel:
         return
 
-    uid = str(message.author.id)
-    ref = db.collection("mood_data").document(uid)
+    try:
 
-    doc = ref.get()
-    data = doc.to_dict() if doc.exists else {
-        "msgs": 0,
-        "caps": 0,
-        "spam": 0
-    }
+        welcome_url = (
+            f"https://api.popcat.xyz/welcomecard?"
+            f"background=https://i.imgur.com/5FL6qEm.png"
+            f"&text1={quote_plus(member.name)}"
+            f"&text2={quote_plus(f'Welcome to {member.guild.name}')}"
+            f"&text3={quote_plus(f'Member #{member.guild.member_count}')}"
+            f"&avatar={quote_plus(member.display_avatar.url)}"
+        )
 
-    content = message.content
+        print(welcome_url)
 
-    data["msgs"] += 1
+        embed = discord.Embed(
+            title="👋 Welcome!",
+            description=f"{member.mention} joined the server.",
+            color=discord.Color.blurple()
+        )
 
-    if content.isupper() and len(content) > 5:
-        data["caps"] += 1
+        embed.set_image(url=welcome_url)
 
-    if len(content) > 100:
-        data["spam"] += 1
+        await channel.send(embed=embed)
 
-    ref.set(data)
+    except Exception as e:
+        print("Welcome error:", e)
 
-    await bot.process_commands(message)
-async def get_mood_from_ai(summary: str):
+@bot.tree.command(
+    name="code",
+    description="Generate code using AI"
+)
+@not_blocked()
+async def code(interaction: discord.Interaction, prompt: str):
 
-    prompt = (
-        "You are a mood analyzer.\n"
-        "Return ONLY one word mood and one emoji.\n"
-        "Format: mood emoji\n\n"
-        f"Data: {summary}"
-    )
-
-    result = await ask_ai(None, prompt)
+    await interaction.response.defer()
 
     try:
-        parts = result.strip().split()
-        return parts[0], parts[1]
-    except:
-        return "neutral", "😐"
-async def mood_scanner():
-    await bot.wait_until_ready()
+        reply = await ask_code(interaction.user.id, prompt)
+    except Exception:
+        reply = "⚠️ Code AI is currently unavailable."
 
-    while not bot.is_closed():
-        await asyncio.sleep(300)  # 5 minutes
-
-        users = db.collection("mood_data").stream()
-
-        for doc in users:
-            uid = doc.id
-            data = doc.to_dict()
-
-            summary = (
-                f"messages={data.get('msgs',0)}, "
-                f"caps={data.get('caps',0)}, "
-                f"spam={data.get('spam',0)}"
-            )
-
-            mood, emoji = await get_mood_from_ai(summary)
-
-            db.collection("mood_data").document(uid).set({
-                **data,
-                "mood": mood,
-                "emoji": emoji,
-                "msgs": 0,
-                "caps": 0,
-                "spam": 0,
-                "updated": str(datetime.datetime.utcnow())
-            })
-@bot.tree.command(
-    name="mood_see",
-    description="See a user's mood."
-                 )
-async def mood_see(interaction: discord.Interaction, member: discord.Member = None):
-
-    member = member or interaction.user
-
-    doc = db.collection("mood_data").document(str(member.id)).get()
-
-    if not doc.exists:
-        return await interaction.response.send_message("No mood data yet.")
-
-    data = doc.to_dict()
-
-    await interaction.response.send_message(
-        f"{data.get('emoji','😐')} {member.name}: {data.get('mood','neutral')}"
-    )
+    await interaction.followup.send(f"```python\n{reply}\n```")
+print("yah running")
 # ================= RUN ================= #
 bot.run(TOKEN)
