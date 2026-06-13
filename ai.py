@@ -14,7 +14,7 @@ HEADERS = {
 
 async def ask_ai(user_id: int, prompt: str):
     return await _call_model(
-        model="meta-llama/llama-3.3-70b-instruct:free",
+        model="meta-llama/llama-3.1-8b-instruct:free",
         prompt=prompt
     )
 
