@@ -276,6 +276,12 @@ async def on_ready():
     global last_message_time
 
     print(f"✅ Logged in as {bot.user}")
+    print("\n===== SERVERS =====")
+    for guild in bot.guilds:
+        print(f"Name: {guild.name}")
+        print(f"ID: {guild.id}")
+        print(f"Members: {guild.member_count}")
+        print("-" * 30)
 
     last_message_time = asyncio.get_event_loop().time()
 
